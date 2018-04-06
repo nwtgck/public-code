@@ -14,6 +14,7 @@ import qualified LLVM.AST.AddrSpace as AST.AddrSpace
 import qualified LLVM.AST.CallingConvention as AST.CallingConvention
 import qualified LLVM.AST.Type as AST.Type
 import qualified LLVM.Target as Target
+import qualified LLVM.AST.FunctionAttribute as AST.FunctionAttribute
 
 import qualified Data.ByteString.Char8 as BS
 import Data.Char
@@ -59,6 +60,8 @@ llvmGCRootFuncGlobal = AST.functionDefaults
   , AST.Global.parameters = ([ AST.Parameter (AST.Type.ptr (AST.Type.ptr AST.Type.i8)) (AST.Name "ptrloc") []
                              , AST.Parameter (AST.Type.ptr AST.Type.i8) (AST.Name "metadata") []
                              ], False)
+  -- (from: @cocreature https://github.com/llvm-hs/llvm-hs/issues/198#issuecomment-379305825)
+  , AST.Global.functionAttributes = [Right AST.FunctionAttribute.NoUnwind]
  }
 
 mainDef :: AST.Definition

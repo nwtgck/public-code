@@ -1,0 +1,12 @@
+<html>
+  <script src="node_modules/pako/dist/pako.min.js"></script>
+  <script>
+    // Don't work well
+    const plainText         = "これは日本語です。"
+    const compressedBinText = pako.deflate(plainText, {to: 'string', level: 9, windowBits: -8});
+    const decompressedText  = pako.inflate(compressedBinText, {to: 'string', windowBits: -8});
+    // They should be the same, but actually not
+    console.log(plainText);
+    console.log(decompressedText);
+  </script>
+</html>

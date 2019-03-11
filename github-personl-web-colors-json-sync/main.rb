@@ -17,7 +17,7 @@ languages_hash = YAML.load(open(language_yml_url, &:read))
 colors_hash.each{|language, value|
   # Skip if nil
   if languages_hash[language].nil?
-    puts("[WRRN] languages_hash[language] is nill where language == #{language}")
+    puts("[WARN] languages_hash[language] is nill where language == #{language}")
     next
   end
   # Get color from github/linguist

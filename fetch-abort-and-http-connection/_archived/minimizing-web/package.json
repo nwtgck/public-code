@@ -1,0 +1,11 @@
+{
+  "name": "minimizing-web",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "devDependencies": {
+    "@vue/cli-service": "^4.5.19"
+  }
+}

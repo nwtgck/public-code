@@ -1,0 +1,22 @@
+<html>
+  <head></head>
+  <body>
+    see console
+    <script>
+      // Register Service Worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js').then(() => {
+          console.log("GETing ...");
+          const controller = new AbortController();
+          fetch("http://localhost:3000/mypath1", {
+            signal: controller.signal,
+          });
+          setTimeout(() => {
+            controller.abort();
+            console.log("aborted!");
+          }, 3000);
+        });
+      }
+    </script>
+  </body>
+</html>

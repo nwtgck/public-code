@@ -2,7 +2,7 @@ use core::convert::Infallible;
 use futures::stream::{StreamExt, TryStreamExt};
 use hyper::service::{make_service_fn, service_fn};
 use hyper::Server;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 use tokio::net::TcpListener;
 use tokio_rustls::TlsAcceptor;
 
@@ -25,8 +25,7 @@ async fn main() -> Result<()> {
     let key_path = "./ssl_certs/server.key";
     let crt_path = "./ssl_certs/server.crt";
 
-    let tls_cfg_rwlock_arc: Arc<RwLock<Arc<rustls::ServerConfig>>> =
-        util::hot_reload_tls_cfg(crt_path, key_path);
+    let tls_cfg = Arc::new(util::load_tls_config(crt_path, key_path)?);
     // Create a TCP listener via tokio.
     let mut tcp: TcpListener = TcpListener::bind(bind_address.clone()).await?;
     // Prepare a long-running future stream to accept and serve clients.
@@ -42,8 +41,7 @@ async fn main() -> Result<()> {
                 }
             };
 
-            let tls_cfg: Arc<rustls::ServerConfig> = (*tls_cfg_rwlock_arc.read().unwrap()).clone();
-            match TlsAcceptor::from(tls_cfg).accept(client).await {
+            match TlsAcceptor::from(tls_cfg.clone()).accept(client).await {
                 Ok(x) => Some(Ok::<_, std::io::Error>(x)),
                 Err(e) => {
                     log::error!("Client connection error: {}", e);

@@ -5,8 +5,7 @@ use futures::channel::oneshot;
 use futures::ready;
 use pin_project_lite::pin_project;
 use std::collections::HashMap;
-use std::ops::Deref;
-use std::sync::{Arc, RwLock};
+
 use tokio::net::TcpStream;
 use tokio_rustls::server::TlsStream;
 
@@ -152,55 +151,6 @@ pub fn load_tls_config(
     // Configure ALPN to accept HTTP/2, HTTP/1.1 in that order.
     cfg.alpn_protocols = vec![b"h2".to_vec(), b"http/1.1".to_vec()];
     Ok(cfg)
-}
-
-pub fn hot_reload_tls_cfg(
-    cert_path: impl AsRef<std::path::Path> + Send + Sync + 'static,
-    key_path: impl AsRef<std::path::Path> + Send + Sync + std::fmt::Display + 'static,
-) -> Arc<RwLock<Arc<rustls::ServerConfig>>> {
-    let cert_path = Arc::new(cert_path);
-    let key_path = Arc::new(key_path);
-    let tls_cfg_rwlock_arc = Arc::new(RwLock::new(Arc::new(
-        load_tls_config(cert_path.deref(), key_path.deref()).unwrap(),
-    )));
-
-    // NOTE: tokio::spawn() blocks servers in some environment because of `loop {}`
-    std::thread::spawn::<_, Result<(), notify::Error>>({
-        let tls_cfg_rwlock = tls_cfg_rwlock_arc.clone();
-        move || {
-            use notify::Watcher;
-            let (tx, rx) = std::sync::mpsc::channel();
-
-            let mut watcher: notify::RecommendedWatcher = notify::Watcher::new(
-                tx,
-                notify::Config::default().with_poll_interval(std::time::Duration::from_secs(5)),
-            )?;
-
-            watcher.watch(
-                cert_path.deref().as_ref(),
-                notify::RecursiveMode::NonRecursive,
-            )?;
-            watcher.watch(
-                key_path.deref().as_ref(),
-                notify::RecursiveMode::NonRecursive,
-            )?;
-
-            loop {
-                match rx.recv() {
-                    Ok(_event) => match load_tls_config(cert_path.deref(), key_path.deref()) {
-                        Ok(tls_cfg) => {
-                            *(tls_cfg_rwlock.clone().write().unwrap()) = Arc::new(tls_cfg);
-                            log::info!("Successfully new certificates loaded");
-                        }
-                        Err(e) => log::error!("Failed to load new certificates: {:?}", e),
-                    },
-                    Err(e) => log::error!("Watch certificates error: {:?}", e),
-                }
-            }
-        }
-    });
-
-    return tls_cfg_rwlock_arc;
 }
 
 pin_project! {

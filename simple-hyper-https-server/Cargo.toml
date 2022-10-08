@@ -1,5 +1,5 @@
 [package]
-name = "piping-server"
+name = "simple-hyper-https-server"
 version = "0.1.0-SNAPSHOT"
 authors = ["Ryo Ota <nwtgck@nwtgck.org>"]
 edition = "2018"

@@ -5,7 +5,6 @@ on: [push]
 defaults:
   run:
     shell: bash
-    working-directory: node18-http-server-stops-request
 
 jobs:
   build:
@@ -23,7 +22,7 @@ jobs:
     - run: sudo apt install -y pv
     - name: Start server1
       run: |
-        node server1.js > server1.log &
+        node node18-http-server-stops-request/server1.js > server1.log &
         sleep 2
     - name: Request
       run: seq 100 | pv -L 10 | curl -sST- http://127.0.0.1:3000

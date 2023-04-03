@@ -14,7 +14,7 @@ jobs:
       matrix:
        node-version: [14.21.3, 16.20.0, 17.9.1, 18.0.0, 18.15.0]
     steps:
-    - run: sleep 180
+    - run: sleep 300
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3

@@ -23,7 +23,10 @@ jobs:
     - run: sudo apt install -y pv
     - name: Start server1
       run: |
-        node server1.js &
+        node server1.js > server1.log &
         sleep 2
     - name: Request
       run: seq 100 | pv -L 10 | curl -sST- http://127.0.0.1:3000
+    - name: Show server1 log
+      if: ${{ always() }}
+      run: cat server1.log

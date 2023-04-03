@@ -1,0 +1,29 @@
+name: node18-http-server-stops-request
+
+on: [push]
+
+defaults:
+  run:
+    shell: bash
+    working-directory: node18-http-server-stops-request
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+       node-version: [12.x, 14.x, 16.x, 18.x]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: sudo apt install -y pv
+    - name: Start server1
+      run: |
+        node server1.js &
+        sleep 2
+    - name: Request
+      run: seq 100 | pv -L 10 | curl -sST- localhost:3000

@@ -26,4 +26,4 @@ jobs:
         node server1.js &
         sleep 2
     - name: Request
-      run: seq 100 | pv -L 10 | curl -sST- 127.0.0.1:3000
+      run: seq 100 | pv -L 10 | curl -sST- http://[::1]:3000

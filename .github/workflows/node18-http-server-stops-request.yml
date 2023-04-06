@@ -35,7 +35,7 @@ jobs:
     - name: Stop tcpdump
       if: ${{ always() }}
       run: |
-        sleep 10
+        sleep 30
         sudo kill -INT $(cat tcpdump.pid)
         sleep 10
     - uses: actions/upload-artifact@v3

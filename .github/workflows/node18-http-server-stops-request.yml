@@ -38,7 +38,7 @@ jobs:
         cat tcpdump.pid
         sleep 3
         sudo kill $(cat tcpdump.pid)
-        sudo chown $USER:USER node-${{ matrix.node-version }}.pcap
+        sudo chown $USER:$USER node-${{ matrix.node-version }}.pcap
     - uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:

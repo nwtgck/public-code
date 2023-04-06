@@ -37,7 +37,7 @@ jobs:
       run: |
         cat tcpdump.pid
         sleep 3
-        kill $(cat tcpdump.pid)
+        sudo kill $(cat tcpdump.pid)
     - uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:

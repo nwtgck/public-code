@@ -21,7 +21,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: sudo apt install -y pv
     - run: |
-        sudo tcpdump -n "host 127.0.0.1 and port 3000" -w node-${{ matrix.node-version }}.pcap &
+        sudo tcpdump -i any -n "host 127.0.0.1 and port 3000" -w node-${{ matrix.node-version }}.pcap &
         echo $! > tcpdump.pid
     - name: Start server1
       run: |
@@ -35,6 +35,7 @@ jobs:
     - name: Stop tcpdump
       if: ${{ always() }}
       run: |
+        ls -la
         cat tcpdump.pid
         sleep 3
         sudo kill $(cat tcpdump.pid)

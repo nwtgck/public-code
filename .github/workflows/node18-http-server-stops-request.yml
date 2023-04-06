@@ -22,6 +22,7 @@ jobs:
     - run: sudo apt install -y pv
     - run: |
         sudo tcpdump -n "host 127.0.0.1 and port 3000" -w node-${{ matrix.node-version }}.pcap &
+        echo $! > tcpdump.pid
     - name: Start server1
       run: |
         node node18-http-server-stops-request/server1.js > server1.log &
@@ -31,8 +32,12 @@ jobs:
     - name: Show server1 log
       if: ${{ always() }}
       run: cat server1.log
-    - if: ${{ always() }}
-      run: ls -la
+    - name: Stop tcpdump
+      if: ${{ always() }}
+      run: |
+        cat tcpdump.pid
+        sleep 3
+        kill $(cat tcpdump.pid)
     - uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:

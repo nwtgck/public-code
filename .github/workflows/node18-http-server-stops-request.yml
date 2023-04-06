@@ -21,7 +21,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: sudo apt install -y pv
     - run: |
-        tcpdump -n "host 127.0.0.1 and port 3000" -w node-${{ matrix.node-version }}.pcap &
+        sudo tcpdump -n "host 127.0.0.1 and port 3000" -w node-${{ matrix.node-version }}.pcap &
     - name: Start server1
       run: |
         node node18-http-server-stops-request/server1.js > server1.log &
@@ -31,4 +31,5 @@ jobs:
     - name: Show server1 log
       if: ${{ always() }}
       run: cat server1.log
-    - run: ls -la
+    - if: ${{ always() }}
+      run: ls -la

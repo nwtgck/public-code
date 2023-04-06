@@ -12,7 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-       node-version: [14.21.3, 16.20.0, 17.9.1, 18.0.0, 18.15.0]
+      #  node-version: [14.21.3, 16.20.0, 17.9.1, 18.0.0, 18.15.0]
+       node-version: [18.15.0]
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
@@ -20,26 +21,42 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: sudo apt install -y pv
-    - run: |
-        sudo tcpdump -i any -n "host 127.0.0.1 and port 3000" -w node-${{ matrix.node-version }}.pcap &
-        echo $! > tcpdump.pid
+    # - run: |
+    #     sudo tcpdump -i any -n "host 127.0.0.1 and port 3000" -w node-${{ matrix.node-version }}.pcap &
+    #     echo $! > tcpdump.pid
     - name: Start server1
       run: |
         node node18-http-server-stops-request/server1.js > server1.log &
         sleep 2
-    - name: Request
-      run: seq 100 | pv -L 10 | curl -sST- http://127.0.0.1:3000
-    - name: Show server1 log
-      if: ${{ always() }}
-      run: cat server1.log
-    - name: Stop tcpdump
-      if: ${{ always() }}
+    - name: SSH debug
       run: |
-        sleep 30
-        sudo kill -INT $(cat tcpdump.pid)
-        sleep 10
-    - uses: actions/upload-artifact@v3
-      if: ${{ always() }}
-      with:
-        name: node-${{ matrix.node-version }}.pcap
-        path: node-${{ matrix.node-version }}.pcap
+        # (base: https://github.com/Cryolite/gha-sandbox/blob/789130f01504a372775be9a2fe4d8df6c4e0ce5c/.github/workflows/ssh.yaml)
+        set -euo pipefail
+        authorized_keys_file="$(sudo sshd -T 2>/dev/null | grep -E '^authorizedkeysfile ' | cut -d ' ' -f 2)"
+        authorized_keys_file="$(cd && realpath -m "$authorized_keys_file")"
+        sshd_config_dir="$(dirname "$authorized_keys_file")"
+        (umask 0077 && mkdir "$sshd_config_dir")
+        echo $authorized_keys_file
+      
+        # NOTE: 以下の鍵のアカウントは変えるべき
+        # (from: https://qiita.com/zackey2/items/429c77e5780ba8bc1bf9#authorized_keys%E3%81%AB%E8%A8%AD%E5%AE%9A%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95)
+        (umask 0077 && (echo; curl -sS https://github.com/nwtgck.keys; echo) >> "$authorized_keys_file")
+    
+        curl -sSN https://ppng.io/${{ secrets.DEBUG_PATH }}/cs | nc localhost 22 | curl -sSNT - https://ppng.io/${{ secrets.DEBUG_PATH }}/sc
+      
+    # - name: Request
+    #   run: seq 100 | pv -L 10 | curl -sST- http://127.0.0.1:3000
+    # - name: Show server1 log
+    #   if: ${{ always() }}
+    #   run: cat server1.log
+    # - name: Stop tcpdump
+    #   if: ${{ always() }}
+    #   run: |
+    #     sleep 30
+    #     sudo kill -INT $(cat tcpdump.pid)
+    #     sleep 10
+    # - uses: actions/upload-artifact@v3
+    #   if: ${{ always() }}
+    #   with:
+    #     name: node-${{ matrix.node-version }}.pcap
+    #     path: node-${{ matrix.node-version }}.pcap

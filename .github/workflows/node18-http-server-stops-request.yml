@@ -33,3 +33,8 @@ jobs:
       run: cat server1.log
     - if: ${{ always() }}
       run: ls -la
+    - uses: actions/upload-artifact@v3
+      if: ${{ always() }}
+      with:
+        name: node-${{ matrix.node-version }}.pcap
+        path: node-${{ matrix.node-version }}.pcap

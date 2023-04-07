@@ -14,6 +14,8 @@ const server = http.createServer((req, res) => {
   res.write("Handling...\n");
 });
 
+server.requestTimeout = Number.MAX_SAFE_INTEGER;
+
 server.listen(3000, () => {
   console.log(`Listening on ${server.address().port}...`);
 });

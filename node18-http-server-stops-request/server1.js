@@ -1,6 +1,6 @@
 const http = require("http");
 
-const server = http.createServer((req, res) => {
+const server = http.createServer({ requestTimeout: Number.MAX_SAFE_INTEGER }, (req, res) => {
   console.log(`${req.method} ${req.url}`);
   req.on("data", (data) => console.log(`on data: ${data.length}B`));
   req.on("close", () => console.log("req closed"));
@@ -13,8 +13,6 @@ const server = http.createServer((req, res) => {
   res.writeHead(200);
   res.write("Handling...\n");
 });
-
-server.requestTimeout = Number.MAX_SAFE_INTEGER;
 
 server.listen(3000, () => {
   console.log(`Listening on ${server.address().port}...`);

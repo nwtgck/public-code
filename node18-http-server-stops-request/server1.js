@@ -1,6 +1,6 @@
 const http = require("http");
 
-const server = http.createServer({ requestTimeout: Number.MAX_SAFE_INTEGER }, (req, res) => {
+const server = http.createServer({ requestTimeout: 0 }, (req, res) => {
   console.log(`${req.method} ${req.url}`);
   req.on("data", (data) => console.log(`on data: ${data.length}B`));
   req.on("close", () => console.log("req closed"));

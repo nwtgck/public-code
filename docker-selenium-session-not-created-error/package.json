@@ -1,0 +1,13 @@
+{
+  "name": "docker-selenium-session-not-created-error",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ryo Ota <nwtgck@nwtgck.org>",
+  "dependencies": {
+    "selenium-webdriver": "^4.8.2"
+  },
+  "devDependencies": {
+    "@types/selenium-webdriver": "^4.1.13"
+  }
+}

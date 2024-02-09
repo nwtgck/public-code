@@ -1,0 +1,31 @@
+name: CI
+
+on: [push]
+
+env:
+  CROSS_VERSION: 0.2.5
+
+jobs:
+  cross_build:
+    strategy:
+      max-parallel: 8
+      fail-fast: false
+      matrix:
+        rust_versoin:
+         - 1.67.1
+         - 1.68.0
+         - 1.76.0
+        target:
+         - i686-linux-android # ERROR
+         - x86_64-linux-android # ERROR
+         - x86_64-unknown-linux-musl # WORKS
+    runs-on: ubuntu-22.04
+    steps:
+      - run: rustup default ${{ matrix.rust_versoin }}
+      - uses: actions/checkout@v4
+      - name: Install cross
+        run: cd /tmp && curl -L https://github.com/cross-rs/cross/releases/download/v${CROSS_VERSION}/cross-x86_64-unknown-linux-musl.tar.gz | tar xzf -
+      - run: /tmp/cross build --target=${{ matrix.target }} --release --locked
+        working-directory: ./cross-android-cannot-find-lunwind
+
+

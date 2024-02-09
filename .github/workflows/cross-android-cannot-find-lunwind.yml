@@ -24,8 +24,7 @@ jobs:
       - run: rustup default ${{ matrix.rust_versoin }}
       - uses: actions/checkout@v4
       - name: Install cross
-        run: cd /tmp && curl -L https://github.com/cross-rs/cross/releases/download/v${CROSS_VERSION}/cross-x86_64-unknown-linux-musl.tar.gz | tar xzf -
-      - run: /tmp/cross build --target=${{ matrix.target }} --release --locked
+        run: cargo install cross --git https://github.com/cross-rs/cross#f272b470f999c7e588fbcf5c0a159d14b5485ff4
+      - run: cross build --target=${{ matrix.target }} --release --locked
         working-directory: ./cross-android-cannot-find-lunwind
-
 
